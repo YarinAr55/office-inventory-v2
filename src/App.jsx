@@ -1,25 +1,11 @@
 import { useState } from "react";
 
 export default function App() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(["עט", "מחברת"]);
   const [name, setName] = useState("");
 
-  function addProduct() {
-    if (!name.trim()) return;
-
-    setProducts([
-      ...products,
-      {
-        id: Date.now(),
-        name,
-      },
-    ]);
-
-    setName("");
-  }
-
   return (
-    <div dir="rtl" style={{ padding: 20, fontFamily: "Arial" }}>
+    <div dir="rtl" style={{ padding: 20 }}>
       <h1>ניהול מלאי ציוד משרדי</h1>
 
       <input
@@ -28,15 +14,21 @@ export default function App() {
         placeholder="שם מוצר"
       />
 
-      <button onClick={addProduct}>
+      <button
+        onClick={() => {
+          if (!name) return;
+          setProducts([...products, name]);
+          setName("");
+        }}
+      >
         הוסף מוצר
       </button>
 
       <hr />
 
-      {products.map((product) => (
-        <div key={product.id}>
-          ✅ {product.name}
+      {products.map((product, index) => (
+        <div key={index}>
+          ✅ {product}
         </div>
       ))}
     </div>
