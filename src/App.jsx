@@ -1,56 +1,38 @@
+import { useState } from "react";
+
 export default function App() {
+  const [items, setItems] = useState([
+    { id: 1, name: "עט כדורי כחול", qty: 120, min: 50 },
+    { id: 2, name: "מחברת A4", qty: 14, min: 20 },
+    { id: 3, name: "עט הדגשה ורוד", qty: 0, min: 40 },
+  ]);
+
+  const totalItems = items.length;
+  const lowStock = items.filter(
+    (item) => item.qty > 0 && item.qty <= item.min
+  ).length;
+  const outOfStock = items.filter((item) => item.qty === 0).length;
+
   return (
     <div
       style={{
-        fontFamily: "Arial",
-        padding: "40px",
         direction: "rtl",
-        background: "#f4f7fb",
+        fontFamily: "Arial",
+        background: "#f5f7fb",
         minHeight: "100vh",
+        padding: 20,
       }}
     >
-      <h1>ניהול מלאי ציוד משרדי</h1>
+      <h1>📦 ניהול מלאי ציוד משרדי</h1>
 
       <div
         style={{
-          background: "white",
-          padding: "20px",
-          borderRadius: "12px",
-          marginTop: "20px",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+          gap: 15,
+          marginTop: 20,
         }}
       >
-        <h2>המוצרים במלאי</h2>
-
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th>מוצר</th>
-              <th>כמות</th>
-              <th>מינימום</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>עט כדורי כחול</td>
-              <td>120</td>
-              <td>50</td>
-            </tr>
-
-            <tr>
-              <td>מחברת A4</td>
-              <td>14</td>
-              <td>20</td>
-            </tr>
-
-            <tr>
-              <td>עט הדגשה ורוד</td>
-              <td>0</td>
-              <td>40</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
+        <div style={card}>
+          <h3>מוצרים</h3>
+          
