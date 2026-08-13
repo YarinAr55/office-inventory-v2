@@ -860,4 +860,53 @@ const styles = `
   .cardActions { margin-top: 17px; border-top: 1px solid #edf0f5; padding-top: 14px; justify-content: flex-start; flex-wrap: wrap; }
   .iconButton, .squareButton {
     border: 0; border-radius: 10px; min-height: 38px; display: inline-flex;
-    
+    align-items: center; justify-content: center; gap: 6px; font-weight: 700;
+  }
+  .iconButton { padding: 8px 11px; }
+  .iconButton.receive { color:#087955; background:#e9f8f2; }
+  .iconButton.remove { color:#aa4f00; background:#fff1dc; }
+  .iconButton:disabled { opacity:.45; cursor:not-allowed; }
+  .squareButton { width:38px; color:#526079; background:#eef2f7; }
+  .squareButton.delete { color:#c4322b; background:#feeeec; }
+  .historySection { margin-top: 36px; }
+  .historyList { background:white; border:1px solid #e3e8f0; border-radius:18px; overflow:hidden; }
+  .historyRow { display:grid; grid-template-columns:45px 1fr 1fr auto; gap:14px; padding:15px 18px; align-items:center; border-bottom:1px solid #edf0f5; }
+  .movementIcon { width:38px; height:38px; display:grid; place-items:center; border-radius:11px; }
+  .movementIcon.receive { color:#087955; background:#e9f8f2; }
+  .movementIcon.remove { color:#aa4f00; background:#fff1dc; }
+  .historyMain span, .historyMeta span { display:block; margin-top:4px; color:#7a869b; font-size:13px; }
+  .balance { background:#f2f5fa; padding:8px 10px; border-radius:9px; font-weight:700; }
+  .emptyHistory, .emptyState { padding:35px; text-align:center; color:#7a869b; }
+  .emptyState { background:white; grid-column:1/-1; border-radius:18px; border:1px dashed #ccd5e3; }
+  .modalBackdrop { position:fixed; inset:0; background:rgba(11,20,35,.56); display:grid; place-items:center; padding:16px; z-index:100; }
+  .modal { width:min(590px, 100%); max-height:92vh; overflow:auto; background:white; border-radius:20px; padding:21px; box-shadow:0 24px 70px rgba(0,0,0,.25); }
+  .modalHeader { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #edf0f5; padding-bottom:14px; margin-bottom:18px; }
+  .modalHeader h2 { margin:0; font-size:22px; }
+  .closeButton { border:0; background:#eef2f7; width:38px; height:38px; border-radius:10px; display:grid; place-items:center; }
+  .form, .field { display:grid; gap:8px; }
+  .form { gap:15px; }
+  .formGrid { display:grid; grid-template-columns:1fr 1fr; gap:13px; }
+  .field span { font-weight:700; color:#3f4b61; }
+  .field input, .field textarea { width:100%; border:1px solid #ccd5e3; border-radius:11px; padding:12px; outline:none; }
+  .field input:focus, .field textarea:focus { border-color:#155eef; box-shadow:0 0 0 3px #e7efff; }
+  .modalActions { display:flex; justify-content:flex-end; gap:9px; margin-top:7px; }
+  .currentStock { background:#edf4ff; color:#155eef; padding:13px; border-radius:11px; }
+  @media (max-width: 1000px) {
+    .summaryGrid { grid-template-columns:repeat(2, 1fr); }
+    .productGrid { grid-template-columns:repeat(2, 1fr); }
+  }
+  @media (max-width: 650px) {
+    .topbar { padding:24px 17px 60px; align-items:stretch; }
+    .headerActions, .headerActions .button { width:100%; }
+    .summaryGrid { grid-template-columns:1fr 1fr; margin-top:-45px; gap:10px; }
+    .summaryCard { min-height:105px; padding:14px; gap:10px; }
+    .summaryIcon { width:40px; height:40px; }
+    .summaryCard strong { font-size:25px; }
+    .productGrid { grid-template-columns:1fr; }
+    .toolbar { align-items:stretch; }
+    .searchBox { min-width:100%; }
+    .formGrid { grid-template-columns:1fr; }
+    .historyRow { grid-template-columns:40px 1fr; }
+    .historyMeta, .balance { grid-column:2; }
+  }
+`;
