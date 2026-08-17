@@ -71,12 +71,10 @@ export default function InventorySystem() {
     const handleSaveItem = (e) => {
         e.preventDefault();
         if (editItem) {
-            // Edit
             setInventory(prev => prev.map(item => item.id === editItem.id ? { ...editItem, ...formData, quantity: Number(formData.quantity), minThreshold: Number(formData.minThreshold), unitCost: Number(formData.unitCost) } : item));
             addLog('UPDATE', `עריכת פריט: ${formData.name}`, 'מנהל מערכת');
             showToast("הפריט עודכן בהצלחה");
         } else {
-            // Add New
             const newItem = {
                 id: Date.now(),
                 ...formData,
@@ -177,7 +175,7 @@ export default function InventorySystem() {
             <main>
                 {/* ==================== TAB 1: DASHBOARD ==================== */}
                 {activeTab === 'dashboard' && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-fade-in">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="bg-white/[0.02] border border-white/[0.06] p-6 rounded-3xl backdrop-blur-2xl">
                                 <div className="text-xs text-slate-400">סך יחידות במאגר</div>
@@ -216,7 +214,7 @@ export default function InventorySystem() {
 
                 {/* ==================== TAB 2: INVENTORY ==================== */}
                 {activeTab === 'inventory' && (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-fade-in">
                         {/* Filters & View Mode */}
                         <div className="flex flex-col md:flex-row justify-between gap-4 bg-white/[0.02] border border-white/[0.06] p-4 rounded-3xl backdrop-blur-2xl">
                             <input
@@ -240,8 +238,8 @@ export default function InventorySystem() {
                                 </select>
 
                                 <div className="flex bg-black/40 p-1 rounded-2xl border border-white/5">
-                                    <button onClick={() => setViewMode('grid')} className={`px-3 py-1.5 rounded-xl text-xs ${viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>תצוגת רשת</button>
-                                    <button onClick={() => setViewMode('table')} className={`px-3 py-1.5 rounded-xl text-xs ${viewMode === 'table' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>תצוגת טבלה</button>
+                                    <button onClick={() => setViewMode('grid')} className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>תצוגת רשת</button>
+                                    <button onClick={() => setViewMode('table')} className={`px-3 py-1.5 rounded-xl text-xs font-semibold ${viewMode === 'table' ? 'bg-indigo-600 text-white' : 'text-slate-400'}`}>תצוגת טבלה</button>
                                 </div>
                             </div>
                         </div>
@@ -271,13 +269,13 @@ export default function InventorySystem() {
 
                                             <div className="pt-4 border-t border-white/[0.06] flex items-center justify-between">
                                                 <div>
-                                                    <div className="text-[10px] text-slate-500">שווי כולל</div>
-                                                    <div className="text-xs font-semibold text-slate-200 mt-0.5">₪{(item.quantity * item.unitCost).toLocaleString()}</div>
+                                                    <div className="text-[10px] text-slate-500">שווי ליחידה / כולל</div>
+                                                    <div className="text-xs font-semibold text-slate-200 mt-0.5">₪{item.unitCost.toFixed(2)} (₪{(item.quantity * item.unitCost).toLocaleString()})</div>
                                                 </div>
 
-                                                <div className="flex items-center gap-2">
-                                                    <button onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl font-bold">-</button>
-                                                    <button onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 bg-white/5 hover:bg-white/10 text-slate-300 rounded-xl font-bold">+</button>
+                                                <div className="flex items-center gap-1.5">
+                                                    <button onClick={() => updateQuantity(item.id, -1)} className="w-8 h-8 bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 rounded-xl flex items-center justify-center transition border border-white/5 font-bold">-</button>
+                                                    <button onClick={() => updateQuantity(item.id, 1)} className="w-8 h-8 bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 rounded-xl flex items-center justify-center transition border border-white/5 font-bold">+</button>
                                                     <button onClick={() => { setEditItem(item); setFormData(item); setIsAddModalOpen(true); }} className="text-xs text-indigo-400 hover:underline px-1">ערוך</button>
                                                     <button onClick={() => setDeleteConfirmId(item.id)} className="text-xs text-rose-400 hover:underline px-1">מחק</button>
                                                 </div>
@@ -287,43 +285,53 @@ export default function InventorySystem() {
                                 })}
                             </div>
                         ) : (
-                            <div className="bg-white/[0.02] border border-white/[0.06] rounded-3xl overflow-hidden backdrop-blur-2xl">
-                                <table className="w-full text-right border-collapse text-xs">
-                                    <thead>
-                                        <tr className="border-b border-white/[0.06] bg-black/40 text-[11px] text-slate-400">
-                                            <th className="p-4">מק״ט</th>
-                                            <th className="p-4">שם המוצר</th>
-                                            <th className="p-4">קטגוריה</th>
-                                            <th className="p-4">מתחם לוגיסטי</th>
-                                            <th className="p-4">כמות</th>
-                                            <th className="p-4">עלות כוללת</th>
-                                            <th className="p-4 text-center">פעולות</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/[0.04]">
-                                        {filteredInventory.map(item => {
-                                            const isLow = item.quantity <= item.minThreshold;
-                                            return (
-                                                <tr key={item.id} className="hover:bg-white/[0.02] transition">
-                                                    <td className="p-4 font-mono text-indigo-400">{item.sku}</td>
-                                                    <td className="p-4 font-bold text-white">{item.name}</td>
-                                                    <td className="p-4 text-slate-300">{item.category}</td>
-                                                    <td className="p-4 text-slate-400">{item.warehouse}</td>
-                                                    <td className={`p-4 font-black ${isLow ? 'text-rose-400' : 'text-emerald-400'}`}>{item.quantity}</td>
-                                                    <td className="p-4 text-slate-300">₪{(item.quantity * item.unitCost).toLocaleString()}</td>
-                                                    <td className="p-4 text-center">
-                                                        <div className="flex items-center justify-center gap-2">
-                                                            <button onClick={() => updateQuantity(item.id, -1)} className="w-7 h-7 bg-white/5 rounded-lg font-bold">-</button>
-                                                            <button onClick={() => updateQuantity(item.id, 1)} className="w-7 h-7 bg-white/5 rounded-lg font-bold">+</button>
-                                                            <button onClick={() => { setEditItem(item); setFormData(item); setIsAddModalOpen(true); }} className="text-indigo-400 hover:underline px-2">ערוך</button>
-                                                            <button onClick={() => setDeleteConfirmId(item.id)} className="text-rose-400 hover:underline px-2">מחק</button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
+                            <div className="bg-white/[0.02] border border-white/[0.06] rounded-3xl backdrop-blur-2xl overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-right border-collapse">
+                                        <thead>
+                                            <tr className="border-b border-white/[0.06] bg-black/40 text-[11px] text-slate-400 font-medium">
+                                                <th className="p-4">מק״ט / SKU</th>
+                                                <th className="p-4">שם המוצר</th>
+                                                <th className="p-4">קטגוריה</th>
+                                                <th className="p-4">מתחם לוגיסטי</th>
+                                                <th className="p-4">כמות</th>
+                                                <th className="p-4">סף מינימום</th>
+                                                <th className="p-4">עלות ליח'</th>
+                                                <th className="p-4">סטטוס</th>
+                                                <th className="p-4 text-center">פעולות</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/[0.04] text-xs">
+                                            {filteredInventory.map(item => {
+                                                const isLow = item.quantity <= item.minThreshold;
+                                                return (
+                                                    <tr key={item.id} className="hover:bg-white/[0.02] transition">
+                                                        <td className="p-4 font-mono text-indigo-400">{item.sku}</td>
+                                                        <td className="p-4 font-bold text-white">{item.name}</td>
+                                                        <td className="p-4 text-slate-300">{item.category}</td>
+                                                        <td className="p-4 text-slate-400">{item.warehouse}</td>
+                                                        <td className={`p-4 font-black ${isLow ? 'text-rose-400' : 'text-emerald-400'}`}>{item.quantity}</td>
+                                                        <td className="p-4 text-slate-400">{item.minThreshold}</td>
+                                                        <td className="p-4 text-slate-300">₪{item.unitCost.toFixed(2)}</td>
+                                                        <td className="p-4">
+                                                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border ${isLow ? 'bg-rose-500/10 text-rose-400 border-rose-500/30' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'}`}>
+                                                                {isLow ? 'קריטי' : 'תקין'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-4 text-center">
+                                                            <div className="flex items-center justify-center gap-2">
+                                                                <button onClick={() => updateQuantity(item.id, -1)} className="w-7 h-7 bg-white/5 rounded-lg hover:bg-white/10 font-bold">-</button>
+                                                                <button onClick={() => updateQuantity(item.id, 1)} className="w-7 h-7 bg-white/5 rounded-lg hover:bg-white/10 font-bold">+</button>
+                                                                <button onClick={() => { setEditItem(item); setFormData(item); setIsAddModalOpen(true); }} className="text-indigo-400 hover:underline px-2">ערוך</button>
+                                                                <button onClick={() => setDeleteConfirmId(item.id)} className="text-rose-400 hover:underline px-2">מחק</button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         )}
                     </div>
@@ -331,107 +339,181 @@ export default function InventorySystem() {
 
                 {/* ==================== TAB 3: ANALYTICS ==================== */}
                 {activeTab === 'analytics' && (
-                    <div className="bg-white/[0.02] border border-white/[0.06] p-8 rounded-3xl backdrop-blur-2xl space-y-6">
-                        <h2 className="text-lg font-bold text-white">ניתוח קטגוריות מלאי ופיזור תפעולי</h2>
-                        <div className="space-y-4 pt-4">
-                            {categoriesBreakdown.map(([cat, qty]) => {
-                                const percentage = totalUnits > 0 ? Math.round((qty / totalUnits) * 100) : 0;
-                                return (
-                                    <div key={cat} className="space-y-2">
-                                        <div className="flex justify-between text-xs">
-                                            <span className="font-semibold text-slate-200">{cat}</span>
-                                            <span className="font-mono text-indigo-400">{qty} יחידות ({percentage}%)</span>
+                    <div className="space-y-6 animate-fade-in">
+                        <div className="bg-white/[0.02] border border-white/[0.06] p-8 rounded-3xl backdrop-blur-2xl space-y-6">
+                            <div>
+                                <h2 className="text-lg font-bold text-white">ניתוח קטגוריות מלאי ופיזור תפעולי</h2>
+                                <p className="text-xs text-slate-400 mt-1">התפלגות יחידות הסחורה לפי קטגוריות מרכזיות במערכת</p>
+                            </div>
+
+                            <div className="space-y-4 pt-4">
+                                {categoriesBreakdown.map(([cat, qty]) => {
+                                    const percentage = totalUnits > 0 ? Math.round((qty / totalUnits) * 100) : 0;
+                                    return (
+                                        <div key={cat} className="space-y-2">
+                                            <div className="flex justify-between text-xs">
+                                                <span className="font-semibold text-slate-200">{cat}</span>
+                                                <span className="font-mono text-indigo-400">{qty} יחידות ({percentage}%)</span>
+                                            </div>
+                                            <div className="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
+                                                <div className="h-full bg-gradient-to-r from-indigo-600 to-cyan-400 rounded-full transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
+                                            </div>
                                         </div>
-                                        <div className="w-full h-3 bg-black/40 rounded-full overflow-hidden border border-white/5">
-                                            <div className="h-full bg-gradient-to-r from-indigo-600 to-cyan-400 rounded-full transition-all duration-1000" style={{ width: `${percentage}%` }}></div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
                 )}
 
                 {/* ==================== TAB 4: SYSTEM LOGS ==================== */}
                 {activeTab === 'logs' && (
-                    <div className="bg-white/[0.02] border border-white/[0.06] p-8 rounded-3xl backdrop-blur-2xl space-y-6">
-                        <div className="flex justify-between items-center">
-                            <h2 className="text-lg font-bold text-white">יומן אירועים ולוג אבטחה גלובלי</h2>
-                            <button onClick={() => { setLogs([]); showToast("היומן נוקה בהצלחה"); }} className="bg-rose-500/10 text-rose-400 px-4 py-2 rounded-xl text-xs font-semibold">איפוס לוגים</button>
-                        </div>
-                        <div className="space-y-3 pt-2">
-                            {logs.map(log => (
-                                <div key={log.id} className="bg-black/30 border border-white/[0.04] p-4 rounded-2xl flex items-center justify-between text-xs">
-                                    <div className="flex items-center gap-4">
-                                        <span className={`w-2.5 h-2.5 rounded-full ${log.type === 'ALERT' ? 'bg-rose-500' : 'bg-emerald-500'}`}></span>
-                                        <div>
-                                            <div className="font-semibold text-white">{log.description}</div>
-                                            <div className="text-[10px] text-slate-400 mt-0.5 font-mono">בוצע על ידי: {log.user}</div>
-                                        </div>
-                                    </div>
-                                    <div className="font-mono text-slate-400">{log.timestamp}</div>
+                    <div className="space-y-6 animate-fade-in">
+                        <div className="bg-white/[0.02] border border-white/[0.06] p-8 rounded-3xl backdrop-blur-2xl space-y-6">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-lg font-bold text-white">יומן אירועים ולוג אבטחה גלובלי</h2>
+                                    <p className="text-xs text-slate-400 mt-1">מעקב ביקורת מלא אחר פעולות משתמשים ועדכוני מערכת אוטומטיים</p>
                                 </div>
-                            ))}
+                                <button
+                                    onClick={() => { setLogs([]); showToast("יומן האירועים נוקה בהצלחה"); }}
+                                    className="bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 px-4 py-2 rounded-xl text-xs font-semibold transition"
+                                >
+                                    איפוס לוגים
+                                </button>
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                {logs.map(log => (
+                                    <div key={log.id} className="bg-black/30 border border-white/[0.04] p-4 rounded-2xl flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <span className={`w-2.5 h-2.5 rounded-full ${log.type === 'ALERT' ? 'bg-rose-500 animate-pulse' : log.type === 'RESTOCK' ? 'bg-emerald-500' : 'bg-indigo-500'}`}></span>
+                                            <div>
+                                                <div className="text-xs font-semibold text-white">{log.description}</div>
+                                                <div className="text-[10px] text-slate-400 mt-0.5 font-mono">בוצע על ידי: {log.user}</div>
+                                            </div>
+                                        </div>
+                                        <div className="text-[11px] font-mono text-slate-400">{log.timestamp}</div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 )}
             </main>
 
-            {/* ==================== ADD / EDIT MODAL ==================== */}
+            {/* ==================== ADD / EDIT ITEM MODAL ==================== */}
             {isAddModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                    <div className="bg-[#0c1017] border border-white/15 w-full max-w-lg rounded-3xl p-8 shadow-2xl space-y-6">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+                    <div className="bg-[#0c1017] border border-white/10 w-full max-w-lg rounded-3xl p-8 shadow-2xl relative space-y-6">
                         <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-bold text-white">{editItem ? 'עריכת פריט' : 'הוספת פריט חדש'}</h3>
-                            <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+                            <h3 className="text-lg font-bold text-white">{editItem ? 'עריכת פרטי פריט' : 'הוספת פריט חדש למאגר'}</h3>
+                            <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-white text-base">✕</button>
                         </div>
-                        <form onSubmit={handleSaveItem} className="space-y-4 text-xs">
+
+                        <form onSubmit={handleSaveItem} className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-slate-400 block mb-1">שם המוצר</label>
-                                    <input type="text" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-black/40 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none focus:border-indigo-500" />
+                                    <label className="text-[11px] text-slate-400 font-medium block mb-1.5">שם המוצר</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        placeholder="לדוגמה: חלב תנובה 3%"
+                                        className="w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-3 rounded-2xl text-xs focus:outline-none focus:border-indigo-500"
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-slate-400 block mb-1">מק״ט / SKU</label>
-                                    <input type="text" value={formData.sku} onChange={e => setFormData({ ...formData, sku: e.target.value })} placeholder="אוטומטי אם ריק" className="w-full bg-black/40 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none focus:border-indigo-500 font-mono" />
+                                    <label className="text-[11px] text-slate-400 font-medium block mb-1.5">מק״ט / SKU</label>
+                                    <input
+                                        type="text"
+                                        value={formData.sku}
+                                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                                        placeholder="SKU-XXXX"
+                                        className="w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-3 rounded-2xl text-xs focus:outline-none focus:border-indigo-500 font-mono"
+                                    />
                                 </div>
                             </div>
+
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-slate-400 block mb-1">קטגוריה</label>
-                                    <select value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full bg-black/40 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none">
+                                    <label className="text-[11px] text-slate-400 font-medium block mb-1.5">קטגוריה</label>
+                                    <select
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-3 rounded-2xl text-xs focus:outline-none focus:border-indigo-500"
+                                    >
                                         <option value="מוצרי חלב" className="bg-slate-900">מוצרי חלב</option>
                                         <option value="מאפים" className="bg-slate-900">מאפים</option>
                                         <option value="בסיסי" className="bg-slate-900">בסיסי</option>
                                         <option value="משאות" className="bg-slate-900">משאות</option>
+                                        <option value="כללי" className="bg-slate-900">כללי</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="text-slate-400 block mb-1">מתחם לוגיסטי</label>
-                                    <select value={formData.warehouse} onChange={e => setFormData({ ...formData, warehouse: e.target.value })} className="w-full bg-black/40 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none">
+                                    <label className="text-[11px] text-slate-400 font-medium block mb-1.5">מתחם לוגיסטי</label>
+                                    <select
+                                        value={formData.warehouse}
+                                        onChange={(e) => setFormData({ ...formData, warehouse: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-3 rounded-2xl text-xs focus:outline-none focus:border-indigo-500"
+                                    >
                                         <option value="מחסן מרכזי - תל אביב" className="bg-slate-900">מחסן מרכזי - תל אביב</option>
                                         <option value="לוגיסטיקה צפון - חיפה" className="bg-slate-900">לוגיסטיקה צפון - חיפה</option>
                                         <option value="לוגיסטיקה דרום - באר שבע" className="bg-slate-900">לוגיסטיקה דרום - באר שבע</option>
                                     </select>
                                 </div>
                             </div>
+
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <label className="text-slate-400 block mb-1">כמות</label>
-                                    <input type="number" min="0" required value={formData.quantity} onChange={e => setFormData({ ...formData, quantity: e.target.value })} className="w-full bg-black/40 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none" />
+                                    <label className="text-[11px] text-slate-400 font-medium block mb-1.5">כמות נוכחית</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="0"
+                                        value={formData.quantity}
+                                        onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-3 rounded-2xl text-xs focus:outline-none focus:border-indigo-500"
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-slate-400 block mb-1">סף מינימום</label>
-                                    <input type="number" min="0" required value={formData.minThreshold} onChange={e => setFormData({ ...formData, minThreshold: e.target.value })} className="w-full bg-black/40 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none" />
+                                    <label className="text-[11px] text-slate-400 font-medium block mb-1.5">סף מינימום</label>
+                                    <input
+                                        type="number"
+                                        required
+                                        min="0"
+                                        value={formData.minThreshold}
+                                        onChange={(e) => setFormData({ ...formData, minThreshold: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-3 rounded-2xl text-xs focus:outline-none focus:border-indigo-500"
+                                    />
                                 </div>
                                 <div>
-                                    <label className="text-slate-400 block mb-1">עלות ליחידה (₪)</label>
-                                    <input type="number" step="0.01" value={formData.unitCost} onChange={e => setFormData({ ...formData, unitCost: e.target.value })} className="w-full bg-black/40 border border-white/10 text-white px-4 py-3 rounded-2xl focus:outline-none" />
+                                    <label className="text-[11px] text-slate-400 font-medium block mb-1.5">עלות ליחידה (₪)</label>
+                                    <input
+                                        type="number"
+                                        step="0.01"
+                                        value={formData.unitCost}
+                                        onChange={(e) => setFormData({ ...formData, unitCost: e.target.value })}
+                                        className="w-full bg-black/40 border border-white/10 text-slate-200 px-4 py-3 rounded-2xl text-xs focus:outline-none focus:border-indigo-500"
+                                    />
                                 </div>
                             </div>
+
                             <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
-                                <button type="button" onClick={() => setIsAddModalOpen(false)} className="bg-white/5 hover:bg-white/10 text-slate-300 px-5 py-2.5 rounded-xl font-semibold">ביטול</button>
-                                <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-indigo-600/30">שמור</button>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsAddModalOpen(false)}
+                                    className="bg-white/5 hover:bg-white/10 text-slate-300 px-5 py-2.5 rounded-xl text-xs font-semibold transition"
+                                >
+                                    ביטול
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-xs font-semibold transition shadow-lg shadow-indigo-600/30"
+                                >
+                                    {editItem ? 'שמור שינויים' : 'הוסף פריט למאגר'}
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -440,14 +522,26 @@ export default function InventorySystem() {
 
             {/* ==================== DELETE CONFIRMATION MODAL ==================== */}
             {deleteConfirmId && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-                    <div className="bg-[#0c1017] border border-rose-500/35 w-full max-w-sm rounded-3xl p-6 text-center space-y-4 shadow-2xl text-xs">
-                        <div className="w-12 h-12 bg-rose-500/10 text-rose-400 rounded-2xl mx-auto flex items-center justify-center font-bold text-xl border border-rose-500/20">!</div>
-                        <h3 className="text-sm font-bold text-white">האם אתה בטוח ברצונך למחוק פריט זה?</h3>
-                        <p className="text-slate-400">פעולה זו תסיר את הפריט לצמיתות מהמערכת.</p>
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
+                    <div className="bg-[#0c1017] border border-rose-500/30 w-full max-w-sm rounded-3xl p-6 shadow-2xl text-center space-y-4">
+                        <div className="w-12 h-12 bg-rose-500/10 text-rose-400 rounded-2xl mx-auto flex items-center justify-center font-bold text-xl border border-rose-500/20">
+                            !
+                        </div>
+                        <h3 className="text-base font-bold text-white">האם אתה בטוח ברצונך למחוק פריט זה?</h3>
+                        <p className="text-xs text-slate-400">פעולה זו תסיר את הפריט לצמיתות מהמערכת הלוגיסטית ואינה ניתנת לביטול.</p>
                         <div className="flex gap-3 pt-2">
-                            <button onClick={() => setDeleteConfirmId(null)} className="flex-1 bg-white/5 py-2.5 rounded-xl font-semibold">ביטול</button>
-                            <button onClick={() => deleteItem(deleteConfirmId)} className="flex-1 bg-rose-600 text-white py-2.5 rounded-xl font-semibold shadow-lg shadow-rose-600/30">מחק</button>
+                            <button
+                                onClick={() => setDeleteConfirmId(null)}
+                                className="flex-1 bg-white/5 hover:bg-white/10 text-slate-300 py-2.5 rounded-xl text-xs font-semibold transition"
+                            >
+                                ביטול
+                            </button>
+                            <button
+                                onClick={() => deleteItem(deleteConfirmId)}
+                                className="flex-1 bg-rose-600 hover:bg-rose-500 text-white py-2.5 rounded-xl text-xs font-semibold transition shadow-lg shadow-rose-600/30"
+                            >
+                                מחק לצמיתות
+                            </button>
                         </div>
                     </div>
                 </div>
