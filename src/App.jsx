@@ -75,30 +75,32 @@ export default function App() {
   const lowStockCount = inventory.filter(item => item.quantity <= item.minThreshold).length;
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-800 p-4 md:p-8 font-sans" dir="rtl">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans selection:bg-indigo-500 selection:text-white" dir="rtl">
       <div className="max-w-6xl mx-auto space-y-6">
         
         {/* Header / Dashboard */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-black text-slate-900">מערכת ניהול מלאי חכמה</h1>
-            <p className="text-slate-500 text-sm mt-1">מעקב מלאי יומי, צריכה והתראות חוסר בזמן אמת</p>
+            <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+              מערכת ניהול מלאי חכמה
+            </h1>
+            <p className="text-slate-400 text-sm mt-1">מעקב מלאי יומי, צריכה והתראות חוסר בזמן אמת</p>
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
             {lowStockCount > 0 ? (
-              <div className="bg-rose-50 text-rose-700 px-4 py-2.5 rounded-2xl border border-rose-100 text-sm font-bold flex items-center gap-2 shadow-sm">
+              <div className="bg-rose-500/10 text-rose-400 px-4 py-2.5 rounded-2xl border border-rose-500/20 text-sm font-bold flex items-center gap-2 shadow-lg shadow-rose-950/50">
                 <span>⚠️ {lowStockCount} מוצרים מתחת למינימום!</span>
               </div>
             ) : (
-              <div className="bg-emerald-50 text-emerald-700 px-4 py-2.5 rounded-2xl border border-emerald-100 text-sm font-bold flex items-center gap-2 shadow-sm">
+              <div className="bg-emerald-500/10 text-emerald-400 px-4 py-2.5 rounded-2xl border border-emerald-500/20 text-sm font-bold flex items-center gap-2 shadow-lg shadow-emerald-950/50">
                 <span>✅ כל המלאי תקין</span>
               </div>
             )}
             
             <button
               onClick={exportToExcel}
-              className="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-2xl text-sm font-bold transition shadow-sm flex items-center gap-2"
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-2xl text-sm font-bold transition shadow-lg shadow-emerald-900/30 flex items-center gap-2"
             >
               📥 ייצוא לאקסל
             </button>
@@ -106,40 +108,40 @@ export default function App() {
         </div>
 
         {/* Add Product Form */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-          <h2 className="text-base font-bold text-slate-900 mb-4">הוספת מוצר חדש למלאי</h2>
+        <div className="bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl shadow-2xl border border-slate-800">
+          <h2 className="text-base font-bold text-slate-200 mb-4">הוספת מוצר חדש למלאי</h2>
           <form onSubmit={handleAddItem} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
             <input
               type="text"
               placeholder="שם המוצר"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+              className="bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
             />
             <input
               type="number"
               placeholder="כמות נוכחית"
               value={form.quantity}
               onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-              className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+              className="bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
             />
             <input
               type="number"
               placeholder="כמות מינימום"
               value={form.minThreshold}
               onChange={(e) => setForm({ ...form, minThreshold: e.target.value })}
-              className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+              className="bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
             />
             <input
               type="number"
               placeholder="צריכה יומית"
               value={form.dailyUsage}
               onChange={(e) => setForm({ ...form, dailyUsage: e.target.value })}
-              className="bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+              className="bg-slate-950 border border-slate-800 text-slate-100 placeholder-slate-500 px-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
             />
             <button
               type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-3 rounded-2xl transition text-sm shadow-md shadow-indigo-100"
+              className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-bold px-4 py-3 rounded-2xl transition text-sm shadow-lg shadow-indigo-950"
             >
               + הוסף מוצר
             </button>
@@ -148,17 +150,17 @@ export default function App() {
 
         {/* View Toggle Bar */}
         <div className="flex justify-between items-center px-1">
-          <h2 className="text-lg font-black text-slate-900">רשימת המוצרים ({inventory.length})</h2>
-          <div className="bg-slate-200/70 p-1.5 rounded-2xl flex gap-1">
+          <h2 className="text-lg font-black text-slate-200">רשימת המוצרים ({inventory.length})</h2>
+          <div className="bg-slate-900 p-1.5 rounded-2xl flex gap-1 border border-slate-800">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${viewMode === 'grid' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${viewMode === 'grid' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950' : 'text-slate-400 hover:text-slate-200'}`}
             >
               🧩 קוביות
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${viewMode === 'table' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              className={`px-4 py-1.5 rounded-xl text-xs font-bold transition ${viewMode === 'table' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950' : 'text-slate-400 hover:text-slate-200'}`}
             >
               📋 טבלה
             </button>
@@ -173,58 +175,58 @@ export default function App() {
               return (
                 <div 
                   key={item.id} 
-                  className={`bg-white p-6 rounded-3xl shadow-sm border transition flex flex-col justify-between relative overflow-hidden ${
-                    isLow ? 'border-rose-200 ring-1 ring-rose-100' : 'border-slate-100 hover:shadow-md'
+                  className={`bg-slate-900/80 backdrop-blur-md p-6 rounded-3xl shadow-xl border transition flex flex-col justify-between relative overflow-hidden group ${
+                    isLow ? 'border-rose-500/40 bg-gradient-to-b from-slate-900 to-rose-950/20' : 'border-slate-800 hover:border-slate-700'
                   }`}
                 >
                   {isLow && (
-                    <div className="absolute top-0 right-0 left-0 bg-rose-500 text-white text-center text-xs py-1 font-black tracking-wide">
-                      נדרשת השלמת מלאי!
+                    <div className="absolute top-0 right-0 left-0 bg-rose-600 text-white text-center text-xs py-1 font-black tracking-wider shadow-md">
+                      ⚠️ נדרשת השלמת מלאי!
                     </div>
                   )}
                   
                   <div className={`mt-2 ${isLow ? 'pt-2' : ''}`}>
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-lg font-black text-slate-900">{item.name}</h3>
+                      <h3 className="text-lg font-black text-slate-100">{item.name}</h3>
                       <button
                         onClick={() => deleteItem(item.id)}
-                        className="text-slate-300 hover:text-rose-500 p-1.5 rounded-xl hover:bg-rose-50 transition"
+                        className="text-slate-500 hover:text-rose-400 p-1.5 rounded-xl hover:bg-rose-500/10 transition"
                         title="מחק מוצר"
                       >
                         🗑️
                       </button>
                     </div>
 
-                    <div className="space-y-2.5 text-sm text-slate-600 mb-6">
-                      <div className="flex justify-between items-center bg-slate-50/80 px-4 py-2.5 rounded-2xl border border-slate-100">
-                        <span className="text-slate-500 text-xs font-bold">כמות במלאי:</span>
-                        <span className={`font-black text-lg ${isLow ? 'text-rose-600' : 'text-slate-900'}`}>{item.quantity}</span>
+                    <div className="space-y-2.5 text-sm text-slate-400 mb-6">
+                      <div className="flex justify-between items-center bg-slate-950 px-4 py-3 rounded-2xl border border-slate-800/80">
+                        <span className="text-slate-400 text-xs font-bold">כמות במלאי:</span>
+                        <span className={`font-black text-xl ${isLow ? 'text-rose-400' : 'text-emerald-400'}`}>{item.quantity}</span>
                       </div>
-                      <div className="flex justify-between px-2 text-xs text-slate-500">
+                      <div className="flex justify-between px-2 text-xs">
                         <span>מינימום נדרש:</span>
-                        <span className="font-bold text-slate-700">{item.minThreshold}</span>
+                        <span className="font-bold text-slate-300">{item.minThreshold}</span>
                       </div>
-                      <div className="flex justify-between px-2 text-xs text-slate-500">
+                      <div className="flex justify-between px-2 text-xs">
                         <span>צריכה יומית:</span>
-                        <span className="font-bold text-slate-700">{item.dailyUsage} יחידות</span>
+                        <span className="font-bold text-slate-300">{item.dailyUsage} יחידות</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center justify-between border-t border-slate-100 pt-4 gap-2">
-                    <span className="text-xs font-bold text-slate-400">עדכן כמות:</span>
+                  <div className="flex items-center justify-between border-t border-slate-800/80 pt-4 gap-2">
+                    <span className="text-xs font-bold text-slate-500">עדכן כמות:</span>
                     <div className="flex gap-2">
                       <button
                         onClick={() => updateQuantity(item.id, -1)}
-                        className="w-10 h-10 bg-slate-100 hover:bg-rose-100 hover:text-rose-600 text-slate-700 font-black rounded-2xl flex items-center justify-center transition shadow-xs"
+                        className="w-10 h-10 bg-slate-950 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 font-black rounded-2xl flex items-center justify-center transition border border-slate-800 shadow-sm"
                         title="הסר יחידה"
                       >
                         -
                       </button>
                       <button
                         onClick={() => updateQuantity(item.id, 1)}
-                        className="w-10 h-10 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-black rounded-2xl flex items-center justify-center transition shadow-xs"
+                        className="w-10 h-10 bg-slate-950 hover:bg-indigo-500/20 hover:text-indigo-400 text-slate-300 font-black rounded-2xl flex items-center justify-center transition border border-slate-800 shadow-sm"
                         title="הוסף יחידה"
                       >
                         +
@@ -237,10 +239,10 @@ export default function App() {
           </div>
         ) : (
           /* Table View */
-          <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
+          <div className="bg-slate-900/80 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-slate-800">
             <table className="w-full text-right border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 text-xs font-bold border-b border-slate-100">
+                <tr className="bg-slate-950/60 text-slate-400 text-xs font-bold border-b border-slate-800">
                   <th className="p-4">שם המוצר</th>
                   <th className="p-4">כמות נוכחית</th>
                   <th className="p-4">מינימום נדרש</th>
@@ -248,35 +250,35 @@ export default function App() {
                   <th className="p-4">פעולות מהירות</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+              <tbody className="divide-y divide-slate-800/60 text-sm">
                 {inventory.map((item) => {
                   const isLow = item.quantity <= item.minThreshold;
                   return (
-                    <tr key={item.id} className={`hover:bg-slate-50/80 transition ${isLow ? 'bg-rose-50/20' : ''}`}>
-                      <td className="p-4 font-black text-slate-900">{item.name}</td>
+                    <tr key={item.id} className={`hover:bg-slate-800/40 transition ${isLow ? 'bg-rose-500/5' : ''}`}>
+                      <td className="p-4 font-black text-slate-200">{item.name}</td>
                       <td className="p-4">
-                        <span className={`font-black px-3 py-1 rounded-xl text-xs ${isLow ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-800'}`}>
+                        <span className={`font-black px-3 py-1 rounded-xl text-xs ${isLow ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
                           {item.quantity} {isLow && '⚠️'}
                         </span>
                       </td>
-                      <td className="p-4 text-slate-600 font-medium">{item.minThreshold}</td>
-                      <td className="p-4 text-slate-600 font-medium">{item.dailyUsage}</td>
+                      <td className="p-4 text-slate-400 font-medium">{item.minThreshold}</td>
+                      <td className="p-4 text-slate-400 font-medium">{item.dailyUsage}</td>
                       <td className="p-4 flex items-center gap-2">
                         <button
                           onClick={() => updateQuantity(item.id, -1)}
-                          className="w-8 h-8 bg-slate-100 hover:bg-rose-100 hover:text-rose-600 rounded-xl font-black text-slate-700 flex items-center justify-center transition"
+                          className="w-8 h-8 bg-slate-950 hover:bg-rose-500/20 hover:text-rose-400 rounded-xl font-black text-slate-300 flex items-center justify-center transition border border-slate-800"
                         >
                           -
                         </button>
                         <button
                           onClick={() => updateQuantity(item.id, 1)}
-                          className="w-8 h-8 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl font-black flex items-center justify-center transition"
+                          className="w-8 h-8 bg-slate-950 hover:bg-indigo-500/20 hover:text-indigo-400 rounded-xl font-black text-slate-300 flex items-center justify-center transition border border-slate-800"
                         >
                           +
                         </button>
                         <button
                           onClick={() => deleteItem(item.id)}
-                          className="text-slate-300 hover:text-rose-500 mr-4 transition"
+                          className="text-slate-500 hover:text-rose-400 mr-4 transition"
                         >
                           🗑️
                         </button>
@@ -290,7 +292,7 @@ export default function App() {
         )}
 
         {inventory.length === 0 && (
-          <div className="bg-white p-12 rounded-3xl text-center text-slate-400 shadow-sm border border-slate-100 font-medium">
+          <div className="bg-slate-900/80 backdrop-blur-md p-12 rounded-3xl text-center text-slate-500 shadow-xl border border-slate-800 font-medium">
             אין פריטים במלאי כרגע. הוסף מוצר חדש דרך הטופס למעלה!
           </div>
         )}
