@@ -1,12 +1,137 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Office Inventory</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>מערכת בקרת לוגיסטיקה גלובלית - NEXUS</title>
 </head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+<body class="bg-[#06080E] text-slate-100 font-sans min-h-screen p-6">
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center bg-white/[0.02] border border-white/[0.06] p-6 rounded-3xl backdrop-blur-2xl">
+            <div>
+                <div class="text-xl font-bold text-white flex items-center gap-2">
+                    NEXUS // Enterprise Logistics
+                    <span class="text-[10px] bg-indigo-500/20 text-indigo-400 px-2 py-0.5 rounded-full border border-indigo-500/30 font-mono">v4.2 STABLE</span>
+                </div>
+                <div class="text-xs text-slate-400 mt-1">מערכת בקרת לוגיסטיקה ואספקה תפעולית גלובלית</div>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="alert('הדו״ח יוצא בהצלחה')" class="bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 border border-white/10 px-4 py-2.5 rounded-xl text-xs font-semibold transition">
+                    ייצוא נתונים (CSV)
+                </button>
+                <button onclick="alert('כפתור הוספת פריט')" class="bg-gradient-to-r from-indigo-600 to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20">
+                    + הוספת פריט חדש
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+            <div class="bg-white/[0.02] border border-white/[0.06] p-6 rounded-3xl backdrop-blur-2xl">
+                <div class="text-xs font-medium text-slate-400">סה״כ פריטים במאגר</div>
+                <div class="text-4xl font-light text-white mt-3">6</div>
+                <div class="text-[11px] text-indigo-400 mt-2">פרוסים על פני 3 מתחמים</div>
+            </div>
+            <div class="bg-white/[0.02] border border-white/[0.06] p-6 rounded-3xl backdrop-blur-2xl">
+                <div class="text-xs font-medium text-slate-400">סך יחידות במלאי הגלובלי</div>
+                <div class="text-4xl font-light text-cyan-400 mt-3">105</div>
+                <div class="text-[11px] text-cyan-400/80 mt-2">יחידות מוכנות לניפוק</div>
+            </div>
+            <div class="bg-rose-950/10 border border-rose-500/30 p-6 rounded-3xl backdrop-blur-2xl">
+                <div class="text-xs font-medium text-slate-400">מוצרים במצב קריטי</div>
+                <div class="text-4xl font-light text-rose-400 mt-3">2</div>
+                <div class="text-[11px] text-rose-400/80 mt-2">דורש הזמנת רכש מיידית</div>
+            </div>
+            <div class="bg-gradient-to-br from-indigo-950/30 to-slate-900/40 border border-indigo-500/20 p-6 rounded-3xl backdrop-blur-2xl flex flex-col justify-between">
+                <div>
+                    <div class="text-xs font-medium text-indigo-300">שווי מלאי כולל מוערך</div>
+                    <div class="text-3xl font-light text-white mt-3">₪1,350.50</div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-white/[0.06] mt-3">
+                    <span class="text-[11px] text-slate-400">סטטוס שרת</span>
+                    <span class="text-[11px] text-emerald-400 flex items-center gap-1.5 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> מקוון (99.9%)
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critical Alerts Box -->
+        <div class="bg-rose-950/10 border border-rose-500/30 rounded-3xl p-6 backdrop-blur-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
+                    <h2 class="text-sm font-bold text-rose-300">התראות מלאי קריטי המחייבות התערבות מיידית</h2>
+                </div>
+                <span class="text-xs text-rose-400 font-mono">סה״כ 2 פריטים</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-[#120a0e] border border-rose-500/20 p-4 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <div class="text-[11px] font-mono text-rose-400">BRD-WHT-02</div>
+                        <div class="text-sm font-bold text-white mt-0.5">לחם פרוס אחיד מלא</div>
+                        <div class="text-xs text-slate-400 mt-1">כמות נוכחית: <span class="text-rose-400 font-bold">4</span> (מינימום: 8)</div>
+                    </div>
+                    <button onclick="alert('הוזמנה השלמת מלאי')" class="bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/30 text-rose-300 px-3 py-2 rounded-xl text-xs font-semibold transition">
+                        השלם מלאי
+                    </button>
+                </div>
+                <div class="bg-[#120a0e] border border-rose-500/20 p-4 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <div class="text-[11px] font-mono text-rose-400">OIL-OLV-05</div>
+                        <div class="text-sm font-bold text-white mt-0.5">שמן זית כתית מעולה 1L</div>
+                        <div class="text-xs text-slate-400 mt-1">כמות נוכחית: <span class="text-rose-400 font-bold">2</span> (מינימום: 5)</div>
+                    </div>
+                    <button onclick="alert('הוזמנה השלמת מלאי')" class="bg-rose-600/20 hover:bg-rose-600/40 border border-rose-500/30 text-rose-300 px-3 py-2 rounded-xl text-xs font-semibold transition">
+                        השלם מלאי
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Table Section -->
+        <div class="bg-white/[0.02] border border-white/[0.06] p-6 rounded-3xl backdrop-blur-2xl space-y-6">
+            <h2 class="text-base font-bold text-white">רשימת פריטים מרכזיים במאגר</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right border-collapse">
+                    <thead>
+                        <tr class="border-b border-white/10 text-slate-400 text-xs">
+                            <th class="py-3 px-4">SKU / מוצר</th>
+                            <th class="py-3 px-4">קטגוריה</th>
+                            <th class="py-3 px-4">מתחם לוגיסטי</th>
+                            <th class="py-3 px-4">כמות</th>
+                            <th class="py-3 px-4">סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/[0.04] text-xs">
+                        <tr class="hover:bg-white/[0.02] transition">
+                            <td class="py-4 px-4 font-semibold text-white">חלב תנובה 3% טרי <div class="text-[10px] text-slate-500 font-mono">MLK-3PCT-01</div></td>
+                            <td class="py-4 px-4 text-indigo-400">מוצרי חלב</td>
+                            <td class="py-4 px-4 text-slate-300">מחסן מרכזי - תל אביב</td>
+                            <td class="py-4 px-4 font-bold text-emerald-400">24 יח'</td>
+                            <td class="py-4 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">תקין</span></td>
+                        </tr>
+                        <tr class="hover:bg-white/[0.02] transition">
+                            <td class="py-4 px-4 font-semibold text-white">לחם פרוס אחיד מלא <div class="text-[10px] text-slate-500 font-mono">BRD-WHT-02</div></td>
+                            <td class="py-4 px-4 text-indigo-400">מאפים</td>
+                            <td class="py-4 px-4 text-slate-300">מחסן מרכזי - תל אביב</td>
+                            <td class="py-4 px-4 font-bold text-rose-400">4 יח'</td>
+                            <td class="py-4 px-4"><span class="bg-rose-500/10 text-rose-400 px-2.5 py-1 rounded-full border border-rose-500/20">קריטי</span></td>
+                        </tr>
+                        <tr class="hover:bg-white/[0.02] transition">
+                            <td class="py-4 px-4 font-semibold text-white">ביצים חופש גודל L <div class="text-[10px] text-slate-500 font-mono">EGG-LGR-03</div></td>
+                            <td class="py-4 px-4 text-indigo-400">בסיסי</td>
+                            <td class="py-4 px-4 text-slate-300">לוגיסטיקה צפון - חיפה</td>
+                            <td class="py-4 px-4 font-bold text-emerald-400">18 יח'</td>
+                            <td class="py-4 px-4"><span class="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">תקין</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
 </body>
 </html>
