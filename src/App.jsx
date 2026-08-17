@@ -1,25 +1,21 @@
 import React, { useState } from 'react';
 import { 
   Package, Plus, Minus, Search, Trash2, AlertTriangle, 
-  CheckCircle, RefreshCw, BarChart3, Settings, ShieldCheck, 
-  X, Filter
+  CheckCircle, BarChart3, X
 } from 'lucide-react';
 
 export default function App() {
-  // מצב נתוני המוצרים במלאי
   const [inventory, setInventory] = useState([
-    id: 1, name: 'נייר צילום A4', category: 'ציוד משרדי', quantity: 45, minStock: 10, price: 25, location: 'מחסן ראשי' ,
-    id: 2, name: 'עטים כחולים (קופסה)', category: 'כתיבה', quantity: 8, minStock: 15, price: 12, location: 'ארון אספקה' ,
-    id: 3, name: 'טונר למדפסת HP', category: 'טכנולוגיה', quantity: 3, minStock: 5, price: 220, location: 'חדר שרתים' ,
-    id: 4, name: 'כוסות קרטון חד פעמיות', category: 'מטבח', quantity: 120, minStock: 50, price: 35, location: 'מטבח קומה 2' ,
+    { id: 1, name: 'נייר צילום A4', category: 'ציוד משרדי', quantity: 45, minStock: 10, price: 25, location: 'מחסן ראשי' },
+    { id: 2, name: 'עטים כחולים (קופסה)', category: 'כתיבה', quantity: 8, minStock: 15, price: 12, location: 'ארון אספקה' },
+    { id: 3, name: 'טונר למדפסת HP', category: 'טכנולוגיה', quantity: 3, minStock: 5, price: 220, location: 'חדר שרתים' },
+    { id: 4, name: 'כוסות קרטון חד פעמיות', category: 'מטבח', quantity: 120, minStock: 50, price: 35, location: 'מטבח קומה 2' },
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('הכל');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('inventory');
 
-  // טופס להוספת מוצר חדש
   const [newProduct, setNewProduct] = useState({
     name: '',
     category: 'ציוד משרדי',
@@ -29,7 +25,6 @@ export default function App() {
     location: 'מחסן ראשי'
   });
 
-  // עדכון כמות (פלוס / מינוס)
   const updateQuantity = (id, delta) => {
     setInventory(inventory.map(item => {
       if (item.id === id) {
@@ -40,12 +35,10 @@ export default function App() {
     }));
   };
 
-  // מחיקת מוצר
   const deleteProduct = (id) => {
     setInventory(inventory.filter(item => item.id !== id));
   };
 
-  // הוספת מוצר חדש לרשימה
   const handleAddProduct = (e) => {
     e.preventDefault();
     if (!newProduct.name) return;
@@ -63,7 +56,6 @@ export default function App() {
     setIsAddModalOpen(false);
   };
 
-  // סינון מוצרים לפי חיפוש וקטגוריה
   const filteredInventory = inventory.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           item.location.toLowerCase().includes(searchTerm.toLowerCase());
@@ -71,14 +63,12 @@ export default function App() {
     return matchesSearch && matchesCategory;
   });
 
-  // חישוב סטטיסטיקות מהירות
   const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
   const lowStockItems = inventory.filter(item => item.quantity <= item.minStock).length;
   const totalValue = inventory.reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
   return (
     <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-800 font-sans">
-      {/* סרגל עליון */}
       <header className="bg-indigo-700 text-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
@@ -91,7 +81,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <button 
               onClick={() => setIsAddModalOpen(true)}
-              className="bg-indigo-600 hover:bg-indigo-500 border border-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition shadow"
+              className="bg-indigo-600 hover:bg-indigo-500 border border-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition shadow cursor-pointer"
             >
               <Plus className="w-4 h-4" /> הוסף מוצר חדש
             </button>
@@ -99,9 +89,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* תוכן ראשי */}
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {/* כרטיסיות סיכום */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
             <div>
@@ -134,7 +122,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* פאנל חיפוש וסינון */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
           <div className="relative w-full sm:w-96">
             <Search className="absolute right-3 top-3 w-5 h-5 text-slate-400" />
@@ -152,7 +139,7 @@ export default function App() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition ${
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition cursor-pointer ${
                   selectedCategory === category 
                     ? 'bg-indigo-600 text-white shadow' 
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -164,7 +151,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* טבלת הנתונים */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-right border-collapse">
@@ -196,14 +182,14 @@ export default function App() {
                           <div className="flex items-center gap-2">
                             <button 
                               onClick={() => updateQuantity(item.id, -1)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition"
+                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition cursor-pointer"
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
                             <span className="w-8 text-center font-bold">{item.quantity}</span>
                             <button 
                               onClick={() => updateQuantity(item.id, 1)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition"
+                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition cursor-pointer"
                             >
                               <Plus className="w-3.5 h-3.5" />
                             </button>
@@ -224,7 +210,7 @@ export default function App() {
                         <td className="py-3 px-4 text-center">
                           <button 
                             onClick={() => deleteProduct(item.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
                             title="מחק מוצר"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -246,15 +232,14 @@ export default function App() {
         </div>
       </main>
 
-      {/* מודל הוספת מוצר */}
       {isAddModalOpen && (
         <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="flex justify-between items-center bg-slate-100 px-6 py-4 border-b border-slate-200">
               <h2 className="font-bold text-slate-800 text-lg">הוספת מוצר חדש למלאי</h2>
               <button 
                 onClick={() => setIsAddModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -338,13 +323,13 @@ export default function App() {
                 <button 
                   type="button"
                   onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition"
+                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition cursor-pointer"
                 >
                   ביטול
                 </button>
                 <button 
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition shadow"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition shadow cursor-pointer"
                 >
                   שמור מוצר
                 </button>
