@@ -1,343 +1,389 @@
-import React, { useState } from 'react';
-import { 
-  Package, Plus, Minus, Search, Trash2, AlertTriangle, 
-  CheckCircle, BarChart3, X
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import './App.css'; // או עיצוב משالك
 
-export default function App() {
-  const [inventory, setInventory] = useState([
-    { id: 1, name: 'נייר צילום A4', category: 'ציוד משרדי', quantity: 45, minStock: 10, price: 25, location: 'מחסן ראשי' },
-    { id: 2, name: 'עטים כחולים (קופסה)', category: 'כתיבה', quantity: 8, minStock: 15, price: 12, location: 'ארון אספקה' },
-    { id: 3, name: 'טונר למדפסת HP', category: 'טכנולוגיה', quantity: 3, minStock: 5, price: 220, location: 'חדר שרתים' },
-    { id: 4, name: 'כוסות קרטון חד פעמיות', category: 'מטבח', quantity: 120, minStock: 50, price: 35, location: 'מטבח קומה 2' },
-  ]);
+function App() {
+  // טעינת נתונים ראשוניים מ-localStorage או ברירת מחדל
+  const [inventory, setInventory] = useState(() => {
+    const saved = localStorage.getItem('office_inventory');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed to parse inventory from localStorage', e);
+      }
+    }
+    return [
+      { id: 1, name: 'עטים כחולים', category: 'ציוד משרדי', quantity: 45, minStock: 10 },
+      { id: 2, name: 'דפים A4 (חבילה)', category: 'נייר ודפוס', quantity: 8, minStock: 15 },
+      { id: 3, name: 'קלסרים רחבים', category: 'ארכיון', quantity: 12, minStock: 5 },
+    ];
+  });
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('הכל');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  
+  // טפסים להוספת מוצר חדש
+  const [newName, setNewName] = useState('');
+  const [newCategory, setNewCategory] = useState('ציוד משרדי');
+  const [newQuantity, setNewQuantity] = useState('');
+  const [newMinStock, setNewMinStock] = useState('');
 
-  const [newProduct, setNewProduct] = useState({
-    name: '',
-    category: 'ציוד משרדי',
-    quantity: 10,
-    minStock: 5,
-    price: 10,
-    location: 'מחסן ראשי'
-  });
+  // שמירה אוטומטית ב-localStorage
+  useEffect(() => {
+    localStorage.setItem('office_inventory', JSON.stringify(inventory));
+  }, [inventory]);
 
-  const updateQuantity = (id, delta) => {
+  // הוספת פריט חדש
+  const handleAddItem = (e) => {
+    e.preventDefault();
+    if (!newName.trim() || newQuantity === '') return;
+
+    const newItem = {
+      id: Date.now(),
+      name: newName.trim(),
+      category: newCategory,
+      quantity: parseInt(newQuantity, 10) || 0,
+      minStock: parseInt(newMinStock, 10) || 5,
+    };
+
+    setInventory([newItem, ...inventory]);
+    setNewName('');
+    setNewQuantity('');
+    setNewMinStock('');
+  };
+
+  // מחיקת פריט
+  const handleDeleteItem = (id) => {
+    setInventory(inventory.filter(item => item.id !== id));
+  };
+
+  // שינוי כמות מהיר (+ / -)
+  const handleUpdateQuantity = (id, delta) => {
     setInventory(inventory.map(item => {
       if (item.id === id) {
-        const newQty = Math.max(0, item.quantity + delta);
-        return { ...item, quantity: newQty };
+        const updatedQty = Math.max(0, item.quantity + delta);
+        return { ...item, quantity: updatedQty };
       }
       return item;
     }));
   };
 
-  const deleteProduct = (id) => {
-    setInventory(inventory.filter(item => item.id !== id));
-  };
-
-  const handleAddProduct = (e) => {
-    e.preventDefault();
-    if (!newProduct.name) return;
-
-    const productToAdd = {
-      ...newProduct,
-      id: Date.now(),
-      quantity: Number(newProduct.quantity),
-      minStock: Number(newProduct.minStock),
-      price: Number(newProduct.price)
-    };
-
-    setInventory([productToAdd, ...inventory]);
-    setNewProduct({ name: '', category: 'ציוד משרדי', quantity: 10, minStock: 5, price: 10, location: 'מחסן ראשי' });
-    setIsAddModalOpen(false);
-  };
-
-  const filteredInventory = inventory.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          item.location.toLowerCase().includes(searchTerm.toLowerCase());
+  // סינון פריטים לפי חיפוש וקטגוריה
+  const filteredItems = inventory.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'הכל' || item.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
-  const lowStockItems = inventory.filter(item => item.quantity <= item.minStock).length;
-  const totalValue = inventory.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+  const categories = ['הכל', 'ציוד משרדי', 'נייר ודפוס', 'ארכיון', 'אחזקה וניקיון', 'אחר'];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-slate-50 text-slate-800 font-sans">
-      <header className="bg-indigo-700 text-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            <Package className="w-8 h-8 text-indigo-200" />
-            <div>
-              <h1 className="text-xl font-bold">ניהול מלאי משרדי</h1>
-              <p className="text-xs text-indigo-200">מערכת בקרה ואספקה חכמה</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={() => setIsAddModalOpen(true)}
-              className="bg-indigo-600 hover:bg-indigo-500 border border-indigo-400 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition shadow cursor-pointer"
-            >
-              <Plus className="w-4 h-4" /> הוסף מוצר חדש
-            </button>
-          </div>
-        </div>
+    <div style={styles.container} dir="rtl">
+      {/* כותרת ראשית */}
+      <header style={styles.header}>
+        <h1 style={styles.title}>📦 ניהול מלאי משרדי</h1>
+        <p style={styles.subtitle}>מעקב חכם ופשוט אחר הציוד במשרד</p>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500 font-medium">סה"כ פריטים במלאי</p>
-              <p className="text-2xl font-bold text-slate-800">{totalItems}</p>
-            </div>
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
-              <Package className="w-6 h-6" />
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500 font-medium">מוצרים במלאי נמוך</p>
-              <p className="text-2xl font-bold text-amber-600">{lowStockItems}</p>
-            </div>
-            <div className="p-3 bg-amber-50 text-amber-600 rounded-lg">
-              <AlertTriangle className="w-6 h-6" />
-            </div>
-          </div>
-
-          <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500 font-medium">שווי מלאי מוערך</p>
-              <p className="text-2xl font-bold text-emerald-600">₪{totalValue.toLocaleString()}</p>
-            </div>
-            <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
-              <BarChart3 className="w-6 h-6" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
-          <div className="relative w-full sm:w-96">
-            <Search className="absolute right-3 top-3 w-5 h-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="חפש לפי שם מוצר או מיקום..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pr-10 pl-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
-
-          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-2 sm:pb-0">
-            {['הכל', 'ציוד משרדי', 'כתיבה', 'טכנולוגיה', 'מטבח'].map(category => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition cursor-pointer ${
-                  selectedCategory === category 
-                    ? 'bg-indigo-600 text-white shadow' 
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                {category}
-              </button>
+      {/* אזור הוספת פריט חדש */}
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>➕ הוספת פריט חדש למלאי</h2>
+        <form onSubmit={handleAddItem} style={styles.formGrid}>
+          <input
+            type="text"
+            placeholder="שם הפריט (למשל: דבק חם)"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            style={styles.input}
+            required
+          />
+          <select
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            style={styles.input}
+          >
+            {categories.filter(c => c !== 'הכל').map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
             ))}
-          </div>
-        </div>
+          </select>
+          <input
+            type="number"
+            placeholder="כמות התחלתית"
+            value={newQuantity}
+            onChange={(e) => setNewQuantity(e.target.value)}
+            style={styles.input}
+            min="0"
+            required
+          />
+          <input
+            type="number"
+            placeholder="מינימום להתראה"
+            value={newMinStock}
+            onChange={(e) => setNewMinStock(e.target.value)}
+            style={styles.input}
+            min="0"
+          />
+          <button type="submit" style={styles.primaryButton}>הוסף למלאי</button>
+        </form>
+      </section>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-right border-collapse">
-              <thead>
-                <tr className="bg-slate-100 text-slate-600 text-xs font-semibold uppercase border-b border-slate-200">
-                  <th className="py-3 px-4">שם המוצר</th>
-                  <th className="py-3 px-4">קטגוריה</th>
-                  <th className="py-3 px-4">מיקום</th>
-                  <th className="py-3 px-4">כמות</th>
-                  <th className="py-3 px-4">מחיר ליחידה</th>
-                  <th className="py-3 px-4">סטטוס</th>
-                  <th className="py-3 px-4 text-center">פעולות</th>
+      {/* סרגל חיפוש וסינון */}
+      <div style={styles.filterBar}>
+        <input
+          type="text"
+          placeholder="🔍 חיפוש פריט..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{ ...styles.input, flex: 2, margin: 0 }}
+        />
+        <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', flex: 3 }}>
+          {categories.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              style={{
+                ...styles.categoryChip,
+                backgroundColor: selectedCategory === cat ? '#007bff' : '#f1f3f5',
+                color: selectedCategory === cat ? '#fff' : '#495057',
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* טבלת המלאי */}
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>📋 רשימת פריטים במלאי ({filteredItems.length})</h2>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={styles.table}>
+            <thead>
+              <tr style={styles.tableHeaderRow}>
+                <th style={styles.th}>שם הפריט</th>
+                <th style={styles.th}>קטגוריה</th>
+                <th style={styles.th}>כמות</th>
+                <th style={styles.th}>סטטוס</th>
+                <th style={styles.th}>פעולות מהירות</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={styles.emptyRow}>לא נמצאו פריטים תואמים.</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
-                {filteredInventory.length > 0 ? (
-                  filteredInventory.map(item => {
-                    const isLow = item.quantity <= item.minStock;
-                    return (
-                      <tr key={item.id} className="hover:bg-slate-50 transition">
-                        <td className="py-3 px-4 font-medium text-slate-800">{item.name}</td>
-                        <td className="py-3 px-4 text-slate-600">
-                          <span className="bg-slate-100 px-2.5 py-1 rounded-md text-xs font-medium">
-                            {item.category}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-slate-600">{item.location}</td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <button 
-                              onClick={() => updateQuantity(item.id, -1)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition cursor-pointer"
-                            >
-                              <Minus className="w-3.5 h-3.5" />
-                            </button>
-                            <span className="w-8 text-center font-bold">{item.quantity}</span>
-                            <button 
-                              onClick={() => updateQuantity(item.id, 1)}
-                              className="w-7 h-7 flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md transition cursor-pointer"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 text-slate-600">₪{item.price}</td>
-                        <td className="py-3 px-4">
-                          {isLow ? (
-                            <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-full text-xs font-medium">
-                              <AlertTriangle className="w-3.5 h-3.5" /> מלאי נמוך
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full text-xs font-medium">
-                              <CheckCircle className="w-3.5 h-3.5" /> תקין
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4 text-center">
+              ) : (
+                filteredItems.map(item => {
+                  const isLowStock = item.quantity <= item.minStock;
+                  return (
+                    <tr key={item.id} style={styles.tableRow}>
+                      <td style={styles.td}><strong>{item.name}</strong></td>
+                      <td style={styles.td}>
+                        <span style={styles.badge}>{item.category}</span>
+                      </td>
+                      <td style={styles.td}>
+                        <span style={{ ...styles.quantityText, color: isLowStock ? '#d9534f' : '#2b2d42' }}>
+                          {item.quantity}
+                        </span>
+                      </td>
+                      <td style={styles.td}>
+                        {isLowStock ? (
+                          <span style={styles.alertBadge}>⚠️ מלאי נמוך</span>
+                        ) : (
+                          <span style={styles.successBadge}>✓ תקין</span>
+                        )}
+                      </td>
+                      <td style={styles.td}>
+                        <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                           <button 
-                            onClick={() => deleteProduct(item.id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
-                            title="מחק מוצר"
+                            onClick={() => handleUpdateQuantity(item.id, 1)} 
+                            style={styles.actionButton}
+                            title="הוסף יחידה"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            +
                           </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="py-8 text-center text-slate-400">
-                      לא נמצאו מוצרים תואמים לחיפוש
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                          <button 
+                            onClick={() => handleUpdateQuantity(item.id, -1)} 
+                            style={styles.actionButton}
+                            title="הורד יחידה"
+                          >
+                            -
+                          </button>
+                          <button 
+                            onClick={() => handleDeleteItem(item.id)} 
+                            style={styles.deleteButton}
+                            title="מחק פריט"
+                          >
+                            מחק
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
         </div>
-      </main>
-
-      {isAddModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
-            <div className="flex justify-between items-center bg-slate-100 px-6 py-4 border-b border-slate-200">
-              <h2 className="font-bold text-slate-800 text-lg">הוספת מוצר חדש למלאי</h2>
-              <button 
-                onClick={() => setIsAddModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleAddProduct} className="p-6 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">שם המוצר</label>
-                <input 
-                  type="text" 
-                  required
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({...newProduct, name: e.target.value})}
-                  placeholder="לדוגמה: מרקרים זוהרים"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">קטגוריה</label>
-                  <select 
-                    value={newProduct.category}
-                    onChange={(e) => setNewProduct({...newProduct, category: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-                  >
-                    <option value="ציוד משרדי">ציוד משרדי</option>
-                    <option value="כתיבה">כתיבה</option>
-                    <option value="טכנולוגיה">טכנולוגיה</option>
-                    <option value="מטבח">מטבח</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">מיקום במשרד</label>
-                  <input 
-                    type="text" 
-                    value={newProduct.location}
-                    onChange={(e) => setNewProduct({...newProduct, location: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">כמות התחלתית</label>
-                  <input 
-                    type="number" 
-                    min="0"
-                    value={newProduct.quantity}
-                    onChange={(e) => setNewProduct({...newProduct, quantity: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">סף התראה</label>
-                  <input 
-                    type="number" 
-                    min="0"
-                    value={newProduct.minStock}
-                    onChange={(e) => setNewProduct({...newProduct, minStock: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">מחיר (₪)</label>
-                  <input 
-                    type="number" 
-                    min="0"
-                    value={newProduct.price}
-                    onChange={(e) => setNewProduct({...newProduct, price: e.target.value})}
-                    className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-                <button 
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition cursor-pointer"
-                >
-                  ביטול
-                </button>
-                <button 
-                  type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-500 transition shadow cursor-pointer"
-                >
-                  שמור מוצר
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      </section>
     </div>
   );
 }
+
+// עיצובים פנימיים (Inline Styles) נקיים ומודרניים למראה מושקע מיידית
+const styles = {
+  container: {
+    maxWidth: '1000px',
+    margin: '0 auto',
+    padding: '24px',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    backgroundColor: '#f8f9fa',
+    minHeight: '100vh',
+    color: '#333',
+  },
+  header: {
+    textAlign: 'center',
+    marginBottom: '30px',
+  },
+  title: {
+    fontSize: '2.2rem',
+    color: '#212529',
+    marginBottom: '8px',
+  },
+  subtitle: {
+    color: '#6c757d',
+    fontSize: '1rem',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    padding: '20px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+    marginBottom: '20px',
+  },
+  sectionTitle: {
+    fontSize: '1.2rem',
+    marginBottom: '15px',
+    color: '#343a40',
+  },
+  formGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+    gap: '12px',
+    alignItems: 'center',
+  },
+  input: {
+    padding: '10px 14px',
+    borderRadius: '8px',
+    border: '1px solid #ced4da',
+    fontSize: '0.95rem',
+    outline: 'none',
+    width: '100%',
+    boxSizing: 'border-box',
+  },
+  primaryButton: {
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '8px',
+    padding: '10px 16px',
+    fontSize: '0.95rem',
+    cursor: 'pointer',
+    fontWeight: '600',
+    transition: 'background 0.2s',
+  },
+  filterBar: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '12px',
+    marginBottom: '20px',
+    alignItems: 'center',
+  },
+  categoryChip: {
+    border: 'none',
+    borderRadius: '20px',
+    padding: '8px 14px',
+    fontSize: '0.85rem',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
+    fontWeight: '500',
+  },
+  table: {
+    width: '100%',
+    borderCollapse: 'collapse',
+    textAlign: 'right',
+  },
+  tableHeaderRow: {
+    borderBottom: '2px solid #dee2e6',
+    backgroundColor: '#f1f3f5',
+  },
+  th: {
+    padding: '12px',
+    color: '#495057',
+    fontSize: '0.9rem',
+  },
+  td: {
+    padding: '12px',
+    borderBottom: '1px solid #e9ecef',
+    fontSize: '0.95rem',
+  },
+  tableRow: {
+    transition: 'background 0.1s',
+  },
+  emptyRow: {
+    textAlign: 'center',
+    padding: '24px',
+    color: '#6c757d',
+  },
+  badge: {
+    backgroundColor: '#e7f5ff',
+    color: '#1c7ed6',
+    padding: '4px 8px',
+    borderRadius: '6px',
+    fontSize: '0.8rem',
+    fontWeight: '500',
+  },
+  successBadge: {
+    color: '#2b8a3e',
+    backgroundColor: '#ebfbee',
+    padding: '4px 8px',
+    borderRadius: '6px',
+    fontSize: '0.8rem',
+    fontWeight: '600',
+  },
+  alertBadge: {
+    color: '#c92a2a',
+    backgroundColor: '#fff5f5',
+    padding: '4px 8px',
+    borderRadius: '6px',
+    fontSize: '0.8rem',
+    fontWeight: '600',
+  },
+  quantityText: {
+    fontWeight: 'bold',
+    fontSize: '1.05rem',
+  },
+  actionButton: {
+    backgroundColor: '#f8f9fa',
+    border: '1px solid #ced4da',
+    borderRadius: '6px',
+    width: '30px',
+    height: '30px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteButton: {
+    backgroundColor: '#fff5f5',
+    color: '#c92a2a',
+    border: '1px solid #ffc9c9',
+    borderRadius: '6px',
+    padding: '4px 8px',
+    cursor: 'pointer',
+    fontSize: '0.8rem',
+  },
+};
+
+export default App;
